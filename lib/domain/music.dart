@@ -16,7 +16,7 @@ class Music {
       id: json['ID'].toString(),
       title: json['title'],
       artist: json['artist'],
-      url: "http://10.0.2.2:8080/api/songs/${json['ID']}/stream",
+      url: "https://music-api.zentradigitalsolution.my.id/api/songs/${json['ID']}/stream",
     );
   }
 }

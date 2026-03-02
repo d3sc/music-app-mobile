@@ -5,7 +5,7 @@ import '../../../core/storage/secure_storage.dart';
 
 class MusicRepository {
 
-  final String baseUrl = "http://10.0.2.2:8080/api/songs";
+  final String baseUrl = "https://music-api.zentradigitalsolution.my.id/api/songs";
 
   Future<List<Music>> getAllMusic() async {
     final token = await SecureStorage.getToken();
