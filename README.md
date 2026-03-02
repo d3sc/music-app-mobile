@@ -1,124 +1,133 @@
-## Go Music API
+#+ Music App 🎵
 
-A simple backend for a music player application, built with **Golang** and **Gin**. This API is intended to be consumed by a **Flutter** mobile application.
+Aplikasi **pemutar musik** sederhana berbasis **Flutter**, dengan fitur autentikasi, daftar koleksi lagu, dan pemutar musik dengan progress bar serta mini player.
 
-### Key Features
+## ✨ Fitur Utama
 
-- **User authentication**: register, login, protected routes using JWT.
-- **Song management**:
-  - upload song files (stored in `music_storage/`),
-  - list all songs,
-  - get song details,
-  - update & delete songs.
-- **Environment documentation** via `.env.example`.
-- **Docker & docker-compose support** for running the API and database.
+- **Autentikasi**
+  - Login dengan token yang disimpan di `SecureStorage`.
+- **Koleksi Musik**
+  - Menampilkan daftar lagu dari API melalui `Dio`.
+  - Setiap item lagu punya judul dan artist.
+- **Music Player**
+  - Menggunakan package `just_audio`.
+  - Mendukung playlist (`ConcatenatingAudioSource`).
+  - Progress bar menggunakan `audio_video_progress_bar`.
+  - Play / pause, seek, dan navigasi antar lagu dari playlist.
+- **Mini Player**
+  - Mini player di bagian bawah list yang menampilkan lagu yang sedang diputar.
+- **State Management**
+  - Menggunakan `provider` dengan `MusicPlayerService` sebagai `ChangeNotifier`.
 
-### Technologies Used
+## 🗂️ Struktur Project Singkat
 
-- **Language**: Go
-- **Web framework**: Gin
-- **Auth**: JWT (JSON Web Token)
-- **Database**: (configured in `config/database.go`, e.g. PostgreSQL / MySQL)
-- **Container**: Docker, docker-compose
+Struktur direktori penting:
 
-### Project Structure (overview)
+- `lib/main.dart`  
+  Entry point aplikasi, inisialisasi `ChangeNotifierProvider<MusicPlayerService>` dan `MaterialApp.router`.
 
-- `main.go` – application entry point.
-- `config/` – database configuration.
-- `controllers/` – HTTP handlers (`auth_controller.go`, `song_controller.go`, etc.).
-- `middleware/` – middleware such as `AuthMiddleware` for route protection.
-- `models/` – model definitions (e.g. `song.go`, `user.go` if present).
-- `routes/` – route initialization and registration.
-- `utils/` – helpers (e.g. `jwt.go`).
-- `music_storage/` – storage location for uploaded song files.
+- `lib/router.dart`  
+  Konfigurasi routing utama aplikasi.
 
-### Environment Configuration
+- `lib/domain/music.dart`  
+  Model/domain `Music` (id, title, artist, url, dll).
 
-Copy `.env.example` to `.env` and fill in the appropriate values:
+- `lib/core/network/dio_client.dart`  
+  Konfigurasi client `Dio` untuk request ke backend.
+
+- `lib/core/storage/secure_storage.dart`  
+  Wrapper penyimpanan token menggunakan secure storage.
+
+- `lib/features/auth/presentation/login_page.dart`  
+  Halaman login.
+
+- `lib/features/music/data/music_repository.dart`  
+  Repository untuk mengambil data musik dari API.
+
+- `lib/features/music/application/music_player_service.dart`  
+  Service/manager pemutar musik:
+  - Mengelola `AudioPlayer`.
+  - Menyimpan playlist (`List<Music>`).
+  - Expose stream posisi & durasi.
+  - Metode `setPlaylist`, `play`, `pause`, `seek`, dll.
+
+- `lib/features/music/presentation/music_collection_page.dart`  
+  Halaman list/koleksi musik:
+  - Ambil data musik dari `MusicRepository`.
+  - Set playlist ke `MusicPlayerService`.
+  - Tapping item akan play lagu dan navigasi ke `MusicPlayerPage`.
+  - Menggunakan `MiniPlayer` di bagian bawah.
+
+- `lib/features/music/presentation/music_page.dart`  
+  Halaman utama player:
+  - Menampilkan info lagu yang sedang diputar (`currentMusic` dari `MusicPlayerService`).
+  - Progress bar + kontrol play/pause (pakai `Consumer<MusicPlayerService>`).
+
+- `lib/features/music/presentation/widget/mini_player.dart`  
+  Widget mini player yang muncul di bawah layar.
+
+## 🚀 Menjalankan Aplikasi
+
+Pastikan sudah menginstall:
+
+- Flutter SDK
+- Dart SDK
+- Android Studio / Xcode (untuk emulator)
+
+### 1. Clone / buka project
 
 ```bash
-cp .env.example .env
+git clone <url-repo-anda>
+cd music_app
 ```
 
-Example variables (see the actual file in your repo for exact names & values):
-
-- `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`
-- `JWT_SECRET`
-
-Make sure `JWT_SECRET` is set to a sufficiently long random string.
-
-### Running Locally (without Docker)
-
-1. **Ensure Go is installed** (Go 1.20+ recommended).
-2. Install dependencies:
-
-   ```bash
-   go mod tidy
-   ```
-
-3. Run database migrations / initialization (if you have a specific command, add it here).
-4. Start the server:
-
-   ```bash
-   go run main.go
-   ```
-
-5. By default, the server usually runs at `http://localhost:8080` (or check `main.go`).
-
-### Running with Docker
-
-Make sure Docker & docker-compose are installed.
+### 2. Install dependency
 
 ```bash
-docker-compose up --build
+flutter pub get
 ```
 
-Once the containers are running, the API will be available at the host & port defined in `docker-compose.yml`.
+### 3. Jalankan aplikasi
 
-### Main Endpoints (summary)
+```bash
+flutter run
+```
 
-The following is a general overview (see `routes/routes.go` for the exact configuration):
+Pilih device/emulator yang tersedia.
 
-- **Auth**
-  - `POST /register` – register a new user.
-  - `POST /login` – login, returns a JWT.
-  - `POST /logout` – logout (typically just instructs the client to remove the token).
+## 🔐 Konfigurasi Backend & Token
 
-- **Songs** (usually protected by `AuthMiddleware`)
-  - `GET /songs` – list all songs.
-  - `GET /songs/:id` – get details for a single song.
-  - `POST /songs` – upload a new song + metadata.
-  - `PUT /songs/:id` – update song metadata.
-  - `DELETE /songs/:id` – delete a song.
+Aplikasi ini mengandalkan:
 
-Refer to the actual implementations in the `controllers/` and `routes/` folders for any differences in paths.
+- **Endpoint API** yang dikonfigurasi di `dio_client.dart`.
+- **Token autentikasi** yang disimpan melalui `SecureStorage`.
 
-### Flutter Integration (Mobile)
+Pastikan:
 
-Important points when connecting a Flutter app to this API:
+- Base URL API diatur dengan benar di `dio_client.dart`.
+- Alur login menyimpan token ke `SecureStorage` sehingga dapat digunakan oleh `MusicPlayerService` saat memanggil API musik dengan header `Authorization: Bearer <token>`.
 
-- **Base URL**: adjust based on your environment (for example `http://10.0.2.2:8080` for Android emulator, or your local IP for a physical device).
-- **Auth**:
-  - On login, store the returned JWT (e.g. using `SharedPreferences` or `flutter_secure_storage`).
-  - Include the header `Authorization: Bearer <token>` for every request to protected endpoints.
-  - For logout, simply remove the token from client storage and optionally call the `/logout` endpoint.
-- **Song file upload**:
-  - Use a multipart request in Flutter (e.g. with the `dio` or `http` packages).
-  - Ensure the field names and paths match what `song_controller.go` expects.
+## 📦 Dependency Utama
 
-### Future Improvements
+Beberapa package penting yang digunakan (lihat lengkap di `pubspec.yaml`):
 
-Some ideas for further development:
+- `provider` – state management.
+- `dio` – HTTP client.
+- `flutter_secure_storage` – penyimpanan token yang aman.
+- `just_audio` – audio player.
+- `audio_video_progress_bar` – komponen progress bar untuk audio.
 
-- Add pagination & filtering for song lists.
+## 🧪 Pengembangan & Tips
 
-- Introduce user roles/permissions (e.g. admin vs regular user).
+- Jika audio tidak mau play:
+  - Cek kembali base URL API dan endpoint musik.
+  - Pastikan token valid dan terkirim di header.
+- Jika playlist selalu kosong:
+  - Pastikan `musicRepository.getAllMusic()` mengembalikan list `Music`.
+  - Pastikan `setPlaylist(musics)` dipanggil sebelum `play()`.
 
-- Add API documentation with Swagger or a Postman collection.
+## 📄 Lisensi
 
-- Add tests (unit & integration tests) for controllers and middleware.
+Sesuaikan bagian ini dengan lisensi yang Anda inginkan, misalnya:
 
-### License
-
-Adjust this section to the license you prefer (e.g. MIT, Apache 2.0, or private/internal).
-
+Proyek ini dibuat untuk keperluan belajar/pribadi. Silakan modifikasi dan gunakan sesuai kebutuhan.
