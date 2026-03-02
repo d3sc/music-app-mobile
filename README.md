@@ -1,133 +1,134 @@
-#+ Music App 🎵
+#+ Music App
 
-Aplikasi **pemutar musik** sederhana berbasis **Flutter**, dengan fitur autentikasi, daftar koleksi lagu, dan pemutar musik dengan progress bar serta mini player.
+This is a **simple music player application** built with **Flutter**, featuring authentication, a music collection list, and a full music player with a progress bar and mini player.
 
-## ✨ Fitur Utama
+## Main Features
 
-- **Autentikasi**
-  - Login dengan token yang disimpan di `SecureStorage`.
-- **Koleksi Musik**
-  - Menampilkan daftar lagu dari API melalui `Dio`.
-  - Setiap item lagu punya judul dan artist.
+- **Authentication**
+  - Login with a token stored in `SecureStorage`.
+- **Music Collection**
+  - Display a list of songs fetched from an API using `Dio`.
+  - Each item shows title and artist.
 - **Music Player**
-  - Menggunakan package `just_audio`.
-  - Mendukung playlist (`ConcatenatingAudioSource`).
-  - Progress bar menggunakan `audio_video_progress_bar`.
-  - Play / pause, seek, dan navigasi antar lagu dari playlist.
+  - Uses the `just_audio` package.
+  - Supports playlists (`ConcatenatingAudioSource`).
+  - Progress bar implemented with `audio_video_progress_bar`.
+  - Play / pause, seek, and navigate between tracks in the playlist.
 - **Mini Player**
-  - Mini player di bagian bawah list yang menampilkan lagu yang sedang diputar.
+  - Mini player at the bottom of the list showing the currently playing song.
 - **State Management**
-  - Menggunakan `provider` dengan `MusicPlayerService` sebagai `ChangeNotifier`.
+  - Uses `provider` with `MusicPlayerService` as a `ChangeNotifier`.
 
-## 🗂️ Struktur Project Singkat
+## Project Structure (Overview)
 
-Struktur direktori penting:
+Important directories and files:
 
 - `lib/main.dart`  
-  Entry point aplikasi, inisialisasi `ChangeNotifierProvider<MusicPlayerService>` dan `MaterialApp.router`.
+  Application entry point, initializes `ChangeNotifierProvider<MusicPlayerService>` and `MaterialApp.router`.
 
 - `lib/router.dart`  
-  Konfigurasi routing utama aplikasi.
+  Main routing configuration.
 
 - `lib/domain/music.dart`  
-  Model/domain `Music` (id, title, artist, url, dll).
+  `Music` domain model (id, title, artist, url, etc.).
 
 - `lib/core/network/dio_client.dart`  
-  Konfigurasi client `Dio` untuk request ke backend.
+  `Dio` client configuration for backend requests.
 
 - `lib/core/storage/secure_storage.dart`  
-  Wrapper penyimpanan token menggunakan secure storage.
+  Wrapper for securely storing tokens.
 
 - `lib/features/auth/presentation/login_page.dart`  
-  Halaman login.
+  Login screen.
 
 - `lib/features/music/data/music_repository.dart`  
-  Repository untuk mengambil data musik dari API.
+  Repository for fetching music data from the API.
 
 - `lib/features/music/application/music_player_service.dart`  
-  Service/manager pemutar musik:
-  - Mengelola `AudioPlayer`.
-  - Menyimpan playlist (`List<Music>`).
-  - Expose stream posisi & durasi.
-  - Metode `setPlaylist`, `play`, `pause`, `seek`, dll.
+  Music player service/manager:
+  - Manages the `AudioPlayer`.
+  - Stores the playlist (`List<Music>`).
+  - Exposes position and duration streams.
+  - Provides `setPlaylist`, `play`, `pause`, `seek`, etc.
 
 - `lib/features/music/presentation/music_collection_page.dart`  
-  Halaman list/koleksi musik:
-  - Ambil data musik dari `MusicRepository`.
-  - Set playlist ke `MusicPlayerService`.
-  - Tapping item akan play lagu dan navigasi ke `MusicPlayerPage`.
-  - Menggunakan `MiniPlayer` di bagian bawah.
+  Music list/collection screen:
+  - Fetches music data via `MusicRepository`.
+  - Sets the playlist in `MusicPlayerService`.
+  - Tapping an item plays the song and navigates to `MusicPlayerPage`.
+  - Uses `MiniPlayer` at the bottom.
 
 - `lib/features/music/presentation/music_page.dart`  
-  Halaman utama player:
-  - Menampilkan info lagu yang sedang diputar (`currentMusic` dari `MusicPlayerService`).
-  - Progress bar + kontrol play/pause (pakai `Consumer<MusicPlayerService>`).
+  Main player screen:
+  - Shows currently playing song info (`currentMusic` from `MusicPlayerService`).
+  - Progress bar and play/pause controls (using `Consumer<MusicPlayerService>`).
 
 - `lib/features/music/presentation/widget/mini_player.dart`  
-  Widget mini player yang muncul di bawah layar.
+  Mini player widget shown at the bottom of the screen.
 
-## 🚀 Menjalankan Aplikasi
+## Running the App
 
-Pastikan sudah menginstall:
+Make sure you have installed:
 
 - Flutter SDK
 - Dart SDK
-- Android Studio / Xcode (untuk emulator)
+- Android Studio / Xcode (for emulators/simulators)
 
-### 1. Clone / buka project
+### 1. Clone / open the project
 
 ```bash
-git clone <url-repo-anda>
+git clone <your-repo-url>
 cd music_app
 ```
 
-### 2. Install dependency
+### 2. Install dependencies
 
 ```bash
 flutter pub get
 ```
 
-### 3. Jalankan aplikasi
+### 3. Run the application
 
 ```bash
 flutter run
 ```
 
-Pilih device/emulator yang tersedia.
+Choose any available device/emulator.
 
-## 🔐 Konfigurasi Backend & Token
+## Backend and Token Configuration
 
-Aplikasi ini mengandalkan:
+This app relies on:
 
-- **Endpoint API** yang dikonfigurasi di `dio_client.dart`.
-- **Token autentikasi** yang disimpan melalui `SecureStorage`.
+- An **API endpoint** configured in `dio_client.dart`.
+- An **authentication token** stored via `SecureStorage`.
 
-Pastikan:
+Make sure:
 
-- Base URL API diatur dengan benar di `dio_client.dart`.
-- Alur login menyimpan token ke `SecureStorage` sehingga dapat digunakan oleh `MusicPlayerService` saat memanggil API musik dengan header `Authorization: Bearer <token>`.
+- The base API URL is correctly configured in `dio_client.dart`.
+- The login flow stores the token in `SecureStorage` so that `MusicPlayerService` can use it when calling the music API with the `Authorization: Bearer <token>` header.
 
-## 📦 Dependency Utama
+## Main Dependencies
 
-Beberapa package penting yang digunakan (lihat lengkap di `pubspec.yaml`):
+Some important packages used (see `pubspec.yaml` for the full list):
 
 - `provider` – state management.
 - `dio` – HTTP client.
-- `flutter_secure_storage` – penyimpanan token yang aman.
-- `just_audio` – audio player.
-- `audio_video_progress_bar` – komponen progress bar untuk audio.
+- `flutter_secure_storage` – secure token storage.
+- `just_audio` – audio playback.
+- `audio_video_progress_bar` – progress bar widget for audio.
 
-## 🧪 Pengembangan & Tips
+## Development Notes and Tips
 
-- Jika audio tidak mau play:
-  - Cek kembali base URL API dan endpoint musik.
-  - Pastikan token valid dan terkirim di header.
-- Jika playlist selalu kosong:
-  - Pastikan `musicRepository.getAllMusic()` mengembalikan list `Music`.
-  - Pastikan `setPlaylist(musics)` dipanggil sebelum `play()`.
+- If audio does not play:
+  - Check the base API URL and music endpoint.
+  - Ensure the token is valid and sent in the headers.
+- If the playlist is always empty:
+  - Make sure `musicRepository.getAllMusic()` returns a `List<Music>`.
+  - Ensure `setPlaylist(musics)` is called before `play()`.
 
-## 📄 Lisensi
+## License
 
-Sesuaikan bagian ini dengan lisensi yang Anda inginkan, misalnya:
+Adjust this section according to the license you prefer, for example:
 
-Proyek ini dibuat untuk keperluan belajar/pribadi. Silakan modifikasi dan gunakan sesuai kebutuhan.
+This project is created for learning/personal purposes. Feel free to modify and use it as needed.
+
