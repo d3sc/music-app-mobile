@@ -59,21 +59,45 @@ class MusicPlayerPage extends StatelessWidget {
 
                 const SizedBox(height: 30),
 
-                IconButton(
-                  icon: Icon(
-                    player.isPlaying
-                        ? Icons.pause
-                        : Icons.play_arrow,
-                    size: 60,
-                  ),
-                  onPressed: () {
-                    if (player.isPlaying) {
-                      player.pause();
-                    } else {
-                      player.play(music);
-                    }
-                  },
-                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // ⏮ PREV
+                    IconButton(
+                      icon: const Icon(Icons.skip_previous, size: 40),
+                      onPressed: () async {
+                        await player.previous();
+                      },
+                    ),
+
+                    const SizedBox(width: 20),
+
+                    // ▶️ PLAY / ⏸ PAUSE
+                    IconButton(
+                      icon: Icon(
+                        player.isPlaying ? Icons.pause : Icons.play_arrow,
+                        size: 60,
+                      ),
+                      onPressed: () {
+                        if (player.isPlaying) {
+                          player.pause();
+                        } else {
+                          player.play(music);
+                        }
+                      },
+                    ),
+
+                    const SizedBox(width: 20),
+
+                    // ⏭ NEXT
+                    IconButton(
+                      icon: const Icon(Icons.skip_next, size: 40),
+                      onPressed: () async {
+                        await player.next();
+                      },
+                    ),
+                  ],
+                )
               ],
             ),
           ),

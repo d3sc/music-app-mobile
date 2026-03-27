@@ -87,4 +87,11 @@ class MusicPlayerService extends ChangeNotifier {
 
   Future<void> pause() async => await _player.pause();
   Future<void> seek(Duration position) async => await _player.seek(position);
+  Future<void> next() async {
+    await _player.seekToNext();
+  }
+
+  Future<void> previous() async {
+    await _player.seekToPrevious();
+  }
 }

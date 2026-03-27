@@ -4,7 +4,7 @@ import '../storage/secure_storage.dart';
 class DioClient {
   static final Dio dio = Dio(
     BaseOptions(
-      baseUrl: "https://music-api.zentradigitalsolution.my.id/api", 
+      baseUrl: "http://10.0.2.2:8080/api", 
       // 10.0.2.2 untuk emulator Android
       connectTimeout: const Duration(seconds: 5),
       receiveTimeout: const Duration(seconds: 5),
