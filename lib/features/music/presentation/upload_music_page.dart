@@ -30,17 +30,45 @@ class _UploadMusicPageState extends State<UploadMusicPage> {
   }
 
   Future<void> uploadSong() async {
-    if (selectedFile == null) return;
+  // VALIDATE FILE
+  if (selectedFile == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Pilih file terlebih dahulu")),
+    );
+    return;
+  }
 
-    setState(() => isLoading = true);
+  // VALIDATE EXTENSION (.mp3)
+  final fileName = selectedFile!.name.toLowerCase();
+  if (!fileName.endsWith(".mp3")) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Hanya file .mp3 yang diperbolehkan")),
+    );
+    return;
+  }
 
+  // VALIDATE INPUT TEXT
+  if (titleController.text.isEmpty || artistController.text.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Title dan Artist wajib diisi")),
+    );
+    return;
+  }
+
+  setState(() => isLoading = true);
+
+  try {
     final token = await SecureStorage.getToken();
+
+    if (token == null) {
+      throw Exception("Token tidak ditemukan, silakan login ulang");
+    }
 
     final dio = Dio();
 
     final formData = FormData.fromMap({
-      "title": titleController.text,
-      "artist": artistController.text,
+      "title": titleController.text.trim(),
+      "artist": artistController.text.trim(),
       "duration": "00:00:00",
       "file": await MultipartFile.fromFile(
         selectedFile!.path!,
@@ -48,32 +76,34 @@ class _UploadMusicPageState extends State<UploadMusicPage> {
       ),
     });
 
-    try {
-      final response = await dio.post(
-        "http://10.0.2.2:8080/api/songs",
-        data: formData,
-        options: Options(
-          headers: {
-            "Authorization": "Bearer $token",
-          },
-        ),
+    final response = await dio.post(
+      "http://10.0.2.2:8080/api/songs",
+      data: formData,
+      options: Options(
+        headers: {
+          "Authorization": "Bearer $token",
+        },
+      ),
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Upload berhasil")),
       );
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Upload berhasil")),
-        );
-        Navigator.pop(context);
-      }
-    } catch (e) {
-      print(e);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Upload gagal")),
-      );
+      Navigator.pop(context);
     }
 
-    setState(() => isLoading = false);
+  } catch (e) {
+    print("UPLOAD ERROR: $e");
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Upload gagal")),
+    );
   }
+
+  setState(() => isLoading = false);
+}
 
   @override
   Widget build(BuildContext context) {
